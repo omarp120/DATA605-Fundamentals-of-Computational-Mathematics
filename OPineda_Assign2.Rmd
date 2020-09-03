@@ -1,0 +1,82 @@
+---
+title: "DATA605 Homework 2 Trace, Determinant, Factorization"
+author: "Omar Pineda"
+date: "9/6/2020"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+1. Problem set 1
+
+(1) Show that A^T x A != A x A^T in general. (Proof and demonstration.)
+
+Let
+
+$$\mathbf{A} = \left[\begin{array}
+{rrr}
+A11 & A12 \\
+A21 & A22 
+\end{array}\right]
+$$
+then we have that
+
+$$\mathbf{A^T} = \left[\begin{array}
+{rrr}
+A11 & A21 \\
+A12 & A22 
+\end{array}\right]
+$$
+
+For A^t x A, we have a 2 x 2 matrix with a value of (A11 x A11 + A12 X A12) in the [1,1] position. In A x A^T we have a 2 x 2 matrix with a value of (A11 x A11 + A21 x A21).
+
+(A11 x A11 + A12 X A12) != (A11 x A11 + A21 x A21) unless A12 = A21, therefore A^T x A != A x A^T in general.
+
+(2) For a special type of square matrix A, we get A^T x A = A x A^T. Under what conditions could this be true? (Hint: The Identity matrix I is an example of such a matrix). 
+
+A^T x A = A x A^T would hold true if A was a symmetric matrix as is the identity matrix.
+
+2. Problem set 2
+
+Matrix factorization is a very important problem. There are supercomputers built just to do matrix factorizations. Every second you are on an airplane, matrices are being factorized. Radars that track flights use a technique called Kalman filtering. At the heart of Kalman Filtering is a Matrix Factorization operation. Kalman Filters are solving linear systems of equations when they track your flight using radars. 
+
+Write an R function to factorize a square matrix A into LU or LDU, whichever you prefer.
+
+In this function, we assume that matrix A can indeed be decomposed.
+
+```{r}
+LU_decomposition <- function(A){
+  U <- A
+  #calculate U by replacing all positions below its diagonal with zeros
+  for (j in 1:(ncol(U)-1)) {
+    for (i in (j+1):nrow(U)) {
+      if (U[i,j]!=0) {
+        U[i,] <- U[i, ] - U[j, ]*(U[i,j]/U[j,j])
+      }
+    }
+  }
+  #calculate L by solving for L_1 in U_1 x L_1 = A_1
+  A_1 <- solve(A)
+  U_1 <- solve(U)
+  L_1 <- solve(U_1, A_1)
+  L <- solve(L_1)
+  #return L and U and have their values include 2 decimals
+  list ("L" = round(L, 2), "U" = round(U,2))
+}
+```
+
+We then test our LU decomposition function with example 1 from the following website: http://mathonline.wikidot.com/the-lu-decomposition-of-a-matrix-examples-1. Matrix A was successfully decomposed.
+
+$$\mathbf{A} = \left[\begin{array}
+{rrr}
+3 & 1 \\
+4 & 2 
+\end{array}\right]
+$$
+
+```{r}
+A <- rbind(c(3, 1),
+                c(4, 2))
+LU <- LU_decomposition(A)
+print(LU)
+```
