@@ -1,0 +1,103 @@
+---
+title: "DATA605 Homework 4 Linear Transformations & Representations"
+author: "Omar Pineda"
+date: "9/20/2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+1. Problem Set 1
+
+In this problem, we’ll verify using R that SVD and Eigenvalues are related as worked out in the weekly module. Given a 3 × 2 matrix A
+
+$$\mathbf{A} = \left[\begin{array}
+{rrr}
+1 & 2 & 3 \\
+-1 & 0 & 4 
+\end{array}\right]
+$$
+
+write code in R to compute X = AA^T and Y = A^TA. Then, compute the eigenvalues and eigenvectors of X and Y using the built-in commands in R. Then, compute the left-singular, singular values, and right-singular vectors of A using the svd command. Examine the two sets of singular vectors and show that they are indeed eigenvectors of X and Y. In addition, the two non-zero eigenvalues (the 3rd value will be very close to zero, if not zero) of both X and Y are the same and are squares of the non-zero singular values of A.
+
+First, we declare A, X and Y.
+
+```{r}
+A <- rbind(c( 1, 2, 3), c(-1, 0, 4))
+X <- A %*% t(A)
+Y <- t(A) %*% A
+```
+
+Next, we compute the eigenvectors of X and Y.
+
+```{r}
+X_eigen <- eigen(X)
+Y_eigen <- eigen(Y)
+X_eigen$vectors
+Y_eigen$vectors
+```
+
+We also compute the left-singular and right-singular vectors of A, and confirm that they are eigenvectors of X and Y.
+
+```{r}
+A_svd <- svd(A)
+A_svd$u
+A_svd$v
+```
+
+Finally, we see that the two non-zero eigenvalues of X and Y are the same.
+
+```{r}
+X_eigen$values
+Y_eigen$values
+```
+
+Moreover, these eigenvalues are also squares of the non-zero singular values of A.
+
+```{r}
+sqrt(Y_eigen$values)
+A_svd$d
+```
+
+2. Problem Set 2
+
+Using the procedure outlined in section 1 of the weekly handout, write a function to compute the inverse of a well-conditioned full-rank square matrix using co-factors. In order
+to compute the co-factors, you may use built-in commands to compute the determinant. Your function should have the following signature: B = myinverse(A) where A is a matrix and B is its inverse and A×B = I. The off-diagonal elements of I should be close to zero, if not zero. Likewise, the diagonal elements should be close to 1, if not 1. Small numerical precision errors are acceptable but the function myinverse should be correct and must use co-factors and determinant of A to compute the inverse.
+
+Here we create our function that computes the inverse of our square matrix using co-factors:
+
+```{r}
+myinverse <- function(A){
+  
+  B <- array(0, dim=dim(A))
+  
+  for (i in 1:nrow(A)) {
+    for (j in 1:ncol(A)) {
+      B[i,j] <- (-1)^(i+j) * det(A[-i,-j])
+    }
+  }
+  
+  t(B)/det(A)
+}
+```
+We then test our function by finding the inverse of the following square matrix:
+
+$$\mathbf{A} = \left[\begin{array}
+{rrr}
+1 & 2 & 3 \\
+4 & 0 & 6 \\
+7 & 8 & 0
+\end{array}\right]
+$$
+
+```{r}
+A <- rbind(c(1,2,3), c(4,0,6), c(7,8,0))
+B <- myinverse(A)
+B
+```
+
+Finally, we confirm that B is the inverse of A by checking whether A x B = I
+
+```{r}
+round(A %*% B)
+```
