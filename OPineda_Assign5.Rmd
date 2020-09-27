@@ -1,0 +1,52 @@
+---
+title: "DATA605 Homework 5 Probability Distributions"
+author: "Omar Pineda"
+date: "9/27/2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+Choose independently two numbers B and C at random from the interval [0, 1] with uniform density. Prove that B and C are proper probability distributions. Note that the point (B,C) is then chosen at random in the unit square.
+
+Both B and C are uniformly distributed. They are proper probability distributions because they are never negative and integrate to 1.
+
+Find the probability that:
+
+(a) B + C < 1/2.
+
+The cumulative distribution function of B + C is F(x) = (1/2) * x^2.
+
+The probability that B + C is between 0 and 1/2 is F(1/2) - F(0) = 1/8 - 0 = 1/8.
+
+(b) B * C < 1/2.
+
+The cumulative distribution function of BC is F(x) = x - x * logx.
+
+The probability that B * C is between 0 and 1/2 is F(1/2) - F(0) = 0.85. 
+
+```{r}
+(0.5 - (0.5 * log(0.5)))
+```
+
+(c) |B − C| < 1/2.
+
+The cumulative distribution function of |B - C| is F(x) = 1 - (1 - x)^2
+
+The probability that |B - C| is between 0 and 1/2 is F(1/2) - F(0) = 0.75. 
+
+```{r}
+(1-(1-0.5)^2)
+```
+
+(d) max{B,C} < 1/2.
+
+The cumulative distribution function of max{B,C} is F(x) = x^2
+
+The probability that max{B,C} is between 0 and 1/2 is F(1/2) - F(0) = 0.25. 
+
+(e) min{B,C} < 1/2.
+
+The cumulative distribution function of min{B,C} is F(x) = 1 - (1 - x)^2
+
+The probability that min{B,C} is between 0 and 1/2 is F(1/2) - F(0) = 0.75.
