@@ -1,0 +1,104 @@
+---
+title: "DATA605 Homework 7 Imp. Distributions / EX / VARX"
+author: "Omar Pineda"
+date: "10/11/2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+1. Let X1, X2, . . . , Xn be n mutually independent random variables, each of which is uniformly distributed on the integers from 1 to k. Let Y denote the minimum of the Xi’s. Find the distribution of Y.
+
+The cumulative distribution function of the minimum of a function uniform on an interval from a to b is denoted by f(x) = 1 - ((b-x)/(b-a))^n.
+
+Here, we want the distribution function of Y which is the minimum of Xi's that are each uniform on the internal 1 to k. So, Y is uniform on the interval 1 to k as well and we plug this interval into our above equation to get f(y) = 1 - ((k-y)/(k-1))^n as our distribution.
+
+2. Your organization owns a copier (future lawyers, etc.) or MRI (future doctors). This machine has a manufacturer’s expected lifetime of 10 years. This means that we expect one failure every ten years. (Include the probability statements and R Code for each part.).
+
+a. What is the probability that the machine will fail after 8 years?. Provide also the expected value and standard deviation. Model as a geometric. (Hint: the probability is equivalent to not failing during the first 8 years..)
+
+This is the probability:
+
+```{r}
+p <- 1/10
+1-sum(dgeom(0:8, p))
+```
+
+This is the mean:
+
+```{r}
+1/p
+```
+
+This is the standard deviation:
+
+```{r}
+sqrt(((1-p)/p^2))
+```
+
+b. What is the probability that the machine will fail after 8 years?. Provide also the expected value and standard deviation. Model as an exponential.
+
+This is the probability:
+
+```{r}
+l <- 1/10
+pexp(8, l, lower.tail = F)
+```
+
+This is the mean and the standard deviation:
+
+```{r}
+1/l
+```
+
+c. What is the probability that the machine will fail after 8 years?. Provide also the expected value and standard deviation. Model as a binomial. (Hint: 0 success in 8 years)
+
+This is the probability:
+
+```{r}
+pbinom(0, 8, p)
+```
+
+This is the mean:
+
+```{r}
+8 * p
+```
+
+This is the standard deviation:
+
+```{r}
+sqrt(8*p*(1-p))
+```
+
+d. What is the probability that the machine will fail after 8 years?. Provide also the expected value and standard deviation. Model as a Poisson. 
+
+This is the probability:
+
+```{r}
+ppois(0, 8*p)
+```
+
+This is the mean:
+
+```{r}
+8*p
+```
+
+This is the standard deviation:
+
+```{r}
+sqrt(8*p)
+```
+
+Weekly discussion post:
+
+Chapter 5.1 Exercise 8
+
+If a coin is tossed a sequence of times, what is the probability that the first head will occur after the fifth toss, given that it has not occurred in the first two tosses?
+
+We want the probability that the first 5 tosses are tails given that the first 2 tosses are tails. This is denoted by P((T,T,T,T,T)|(T,T)) = (1-p)^5 / (1-p)^2 = (1-p)^3. Plugging in 0.5 for p in our equation, we get that this probability is equal to 0.125.
+
+```{r}
+(1-.5)^3
+```
