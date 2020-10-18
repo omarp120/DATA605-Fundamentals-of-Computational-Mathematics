@@ -1,0 +1,88 @@
+---
+title: "DATA605 Homework 8 Sums of Random Variables, Law of Large Numbers"
+author: "Omar Pineda"
+date: "10/18/2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+11 and 14 on page 303 of probability text
+
+11. A company buys 100 lightbulbs, each of which has an exponential lifetime of 1000 hours. What is the expected time for the first of these bulbs to burn out? (See Exercise 10.)
+
+μ/n= 1000/100 = 10
+
+So, the expected time for the first of these bulbs to burn out is 10 hours.
+
+14. Assume that X1 and X2 are independent random variables, each having anexponential density with parameter λ. Show that Z = X1 − X2 has density fZ(z) = (1/2)λe^(−λ|z|).
+
+The following expressions are equivalent.
+
+$$\int_{-∞}^∞ fX(z+y)fY(y)dy$$
+$$\int_{0}^z λe^{−λ(z+y)}λe^{−λy}dy$$
+$$\int_{0}^z λ^2e^{−λ(z+2y)}dy$$
+=(1/2)λe^(−λ|z|)
+
+1 on page 320-321
+
+1. Let X be a continuous random variable with mean µ = 10 and variance σ^2 = 100/3. Using Chebyshev’s Inequality, find an upper bound for the following probabilities.
+
+(a) P(|X − 10| ≥ 2).
+
+P(|X − 10| ≥ 2) <= (100/3) / (2^2) = 8.333
+
+(b) P(|X − 10| ≥ 5).
+
+P(|X − 10| ≥ 5) <= (100/3) / (5^2) = 1.333
+
+(c) P(|X − 10| ≥ 9).
+
+P(|X − 10| ≥ 9) <= (100/3) / (9^2) = 0.412
+
+(d) P(|X − 10| ≥ 20).
+
+P(|X − 10| ≥ 20) <= (100/3) / (20^2) = 0.083
+
+Weekly discussion post:
+
+Chapter 7.1, Exercise 1
+
+A die is rolled three times. Find the probability that the sum of the outcomes is
+
+(a) greater than 9.
+
+There are a total of 6*6*6 = 216 possible sums when we roll a die three times. If we simulate all of the different rolls, we find that 135 of them sum to be greater than 9. So, this probability is 135/216 = 0.625.
+
+```{r}
+greater_than_9 <- 0
+die <- c(1,2,3,4,5,6)
+for (a in die) {
+  for (b in die) {
+    for (c in die) {
+      if (a+b+c > 9) {
+        greater_than_9 <- greater_than_9+1
+      }
+    }
+  }
+}
+print(greater_than_9)   
+```
+
+(b) an odd number.
+
+Similarly, we count how many of the sums are odd and find that there are 108 of them. So this probability is 108/216 = 0.5.
+
+```{r}
+odd_sums <- 0
+for (a in die) {
+  for (b in die) {
+    for (c in die) {
+      if (((a+b+c) %% 2) != 0) {
+        odd_sums <- odd_sums+1
+      }
+    }
+  }
+}
+print(odd_sums) 
+```
