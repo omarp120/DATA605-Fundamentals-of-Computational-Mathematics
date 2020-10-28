@@ -1,0 +1,63 @@
+---
+title: "DATA605 Homework 10 Markov Chains/Random Walks"
+author: "Omar Pineda"
+date: "11/1/2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+Smith is in jail and has 1 dollar; he can get out on bail if he has 8 dollars. A guard agrees to make a series of bets with him. If Smith bets A dollars, he wins A dollars with probability .4 and loses A dollars with probability .6.
+
+Find the probability that he wins 8 dollars before losing all of his money if
+
+(a) he bets 1 dollar each time (timid strategy).
+
+We have the following equation from the "Gambler's Ruin" problem in section 12.2:
+
+((q/p)^M − (q/p)^z)/((q/p)^M − 1)
+
+q is the probability that the gambler's stake reaches 0, which is .6 in our problem. Since p+q = 1, we have that p equals .4. M equals 8 here since it is the dollar amount that Smith is trying to reach. Lastly, z equals 1 since Smith starts with 1 dollar. Plugging these in we get the following for the probability that Smith loses all of his money:
+
+```{r}
+p_lose <- ((.6/.4)^8 - (.6/.4)^1)/((.6/.4)^8 - 1)
+p_lose
+```
+
+So, the probability that Smith wins 8 dollars before losing all of his money is:
+
+```{r}
+1-p_lose
+```
+
+(b) he bets, each time, as much as possible but not more than necessary to bring his fortune up to 8 dollars (bold strategy).
+
+In this scenario, Smith would bet his entire dollar to get 2 dollars, then bet those 2 dollars to get 4 dollars, and finally bet those 4 dollars to have 8 dollars. The probability of this happening is the probability of winning 3 bets in a row which is equal to:
+
+```{r}
+.4^3
+```
+
+(c) Which strategy gives Smith the better chance of getting out of jail?
+
+Strategy (b) gives Smith a better chance of getting out of jail since he's betting fewer times which is better since the odds are mostly against him with each bet.
+
+Weekly discussion post:
+
+Chapter 11.2 Exercise 1
+
+Recall:
+
+Example 11.4 The President of the United States tells person A his or her intention to run or not to run in the next election. Then A relays the news to B, who in turn relays the message to C, and so forth, always to some new person. We assume that there is a probability a that a person will change the answer from yes to no when transmitting it to the next person and a probability b that he or she will change it from no to yes. We choose as states the message, either yes or no.
+
+The transition matrix is then
+
+P = [__  yes no]
+    [yes 1−a  a]
+    [no  b  1−b]
+
+The initial state represents the President’s choice.
+
+1. In Example 11.4, for what values of a and b do we obtain an absorbing Markov chain?
+
+The only way for this transition matrix to reach an absorving state is if either Pyes,yes equals 1 or Pno,no equals 1. For this to happen, either a needs to equal 0 or b needs to equal 0.
