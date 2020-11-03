@@ -1,0 +1,100 @@
+---
+title: "DATA605 Homework 12 Regression Analysis in R 2"
+author: "Omar Pineda"
+date: "11/22/2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+The attached who.csv dataset contains real-world data from 2008. The variables included follow.
+
+Country: name of the country
+LifeExp: average life expectancy for the country in years
+InfantSurvival: proportion of those surviving to one year or more
+Under5Survival: proportion of those surviving to five years or more
+TBFree: proportion of the population without TB.
+PropMD: proportion of the population who are MDs
+PropRN: proportion of the population who are RNs
+PersExp: mean personal expenditures on healthcare in US dollars at average exchange rate
+GovtExp: mean government expenditures per capita on healthcare, US dollars at average exchange rate
+TotExp: sum of personal and government expenditures.
+
+1. Provide a scatterplot of LifeExp~TotExp, and run simple linear regression. Do not transform the variables. Provide and interpret the F statistics, R^2, standard error, and p-values only. Discuss whether the assumptions of simple linear regression met.
+
+First, we load our libraries and our data and preview it.
+
+```{r}
+library(ggplot2)
+library(dplyr)
+```
+
+```{r}
+who <- read.csv("who.csv")
+head(who)
+```
+
+Here we visualize a scatterplot of Life Expectancy by Total Government Expenditures. It appears that life expectancy increases with government expenditures, but the relationship appears logarithmic rather than linear.
+
+```{r, include=TRUE}
+who %>% ggplot(aes(x=TotExp, y=LifeExp)) + geom_point() + geom_smooth(method="lm") + labs(x="Total Government Expenditures", y="Life Expectancy", title="Life Expectancy by Total Government Expenditures")
+```
+
+We then generate our linear model. It appears that total expenditures is a statistically significant predictor for life expectancy as it has a p-value of 7.71e-14 < 0.05. It is also a significant predictor when we look at the F-statistic. Its R^2 tells us that the model explains about 25% of the variability in life expectancy, which can be higher if we tried a different model. 
+
+```{r}
+m1 <- lm(LifeExp ~ TotExp, data=who)
+summary(m1)
+```
+
+2. Raise life expectancy to the 4.6 power (i.e., LifeExp^4.6). Raise total expenditures to the 0.06 power (nearly a log transform, TotExp^.06). Plot LifeExp^4.6 as a function of TotExp^.06, and re-run the simple regression model using the transformed variables. Provide and interpret the F statistics, R^2, standard error, and p-values. Which model is "better?"
+
+First, we plot our transformed variables and see that there is now a more linear relationship.
+
+```{r}
+who %>% ggplot(aes(x=TotExp^.06, y=LifeExp^4.6)) + geom_point() + geom_smooth(method="lm") + labs(x="Total Government Expenditures", y="Life Expectancy", title="Life Expectancy by Total Government Expenditures (Transformed)")
+```
+
+We then generate our linear model using the transformed variables. It appears that total expenditures is a statistically significant predictor for life expectancy as it has a p-value of 2e-16 < 0.05. It is also a significant predictor when we look at the F-statistic. Its R^2 tells us that the model explains about 73% of the variability in life expectancy which is much higher than the 25% that we had in model 1. Overall, this model is better than the one in part 1.
+
+```{r}
+m2 <- lm(I(LifeExp^4.6) ~ I(TotExp^.06), data=who)
+summary(m2)
+```
+
+3. Using the results from 3, forecast life expectancy when TotExp^.06 =1.5. Then forecast life expectancy when TotExp^.06=2.5.
+
+For TotExp^.06 = 1.5, we have an expected life expectancy of 63.31.
+
+```{r}
+(-736527910 + 620060216*1.5)^(1/4.6)
+```
+
+For TotExp^.06 = 2.5, we have an expected life expectancy of 86.51.
+
+```{r}
+(-736527910 + 620060216*2.5)^(1/4.6)
+```
+
+4. Build the following multiple regression model and interpret the F Statistics, R^2, standard error, and p-values. How good is the model? LifeExp = b0+b1 x PropMd + b2 x TotExp +b3 x PropMD x TotExp
+
+We then generate our multiple regression model. It appears that total expenditures and the proportion of the population that are MDs are statistically significant predictors for life expectancy based on their p-values. They are also significant predictors when we look at the F-statistic. Its R^2 tells us that the model explains about 36% of the variability in life expectancy which is higher than the 25% that we had for model 1 but lower than the 75% that we had for model 2. Overall, this model is better than model 1 but not better than model 2.
+
+```{r}
+m3 <- lm(I(LifeExp ~ PropMD + TotExp + PropMD:TotExp), data=who)
+summary(m3)
+```
+
+5. Forecast LifeExp when PropMD =.03 and TotExp = 14. Does this forecast seem realistic? Why or why not?
+
+The forecast for this scenario is a life expectancy of 107.68.
+
+```{r}
+6.277e+01 + 1.497e+03*.03 + 7.233e-05*14 - 6.026e-03
+```
+
+This is unrealistic as the maximum life expectancy that we have in our dataset is 83 and our model is not able to accurately learn about scenarios where the average life expectancy is greater than this. As we previously determined, this model is not good at predicting life expectancy and model 2 would be a better fit for us to use here.
+
+```{r}
+max(who$LifeExp)
+```
