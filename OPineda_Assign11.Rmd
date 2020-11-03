@@ -1,0 +1,57 @@
+---
+title: "DATA605 Homework 11 Regression Analysis in R"
+author: "Omar Pineda"
+date: "11/15/2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+Using the “cars” dataset in R, build a linear model for stopping distance as a function of speed and replicate the analysis of your textbook chapter 3 (visualization, quality evaluation of the model, and residual analysis.)
+
+First, we load any necessary libraries.
+
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+
+We then preview our cars dataset.
+
+```{r}
+head(cars)
+```
+
+Here we visualize a scatterplot of stopping distance by speed.
+
+```{r}
+cars %>% ggplot(aes(x=speed, y=dist)) + geom_point() + geom_smooth(method="lm") + labs(x="Speed", y="Stopping Distance", title="Stopping Distance by Speed")
+```
+
+We then generate our linear model. It appears that speed is a statistically significant predictor for stopping distance, and it also explains about 65% of the variability in stopping speed.
+
+```{r}
+m1 <- lm(dist ~ speed, data=cars)
+summary(m1)
+```
+
+Lastly, we conduct some residual analysis to determine whether this linear model is appropriate.
+
+### Inference: (1) Linearity and (2) Constant Variability
+
+(1) There does not appear to be a pattern in the residuals of the linear regression, so the relationship between Speed and Stopping Distance is linear.
+
+(2) Based on our scatter plot of the residuals, we appear to have constant variability.
+
+```{r residuals, eval=TRUE}
+plot(m1$residuals ~ cars$speed)
+abline(h = 0, lty = 3)  # adds a horizontal dashed line at y = 0
+```
+
+### Inference: (3) Nearly normal residuals
+
+(3) The distribution of our model's residuals is slightly skewed but still nearly normal. The linear model is a pretty good start but there may be better options out there for modeling stopping distance.
+
+```{r hist-res, eval=TRUE}
+hist(m1$residuals)
+```
