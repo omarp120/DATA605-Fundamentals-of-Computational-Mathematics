@@ -1,0 +1,52 @@
+---
+title: "DATA605 Homework 14 Taylor Series Approximations"
+author: "Omar Pineda"
+date: "12/6/2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+This week, we’ll work out some Taylor Series expansions of popular functions.
+
+• f(x) = 1/(1−x)
+• f(x) = e^x
+• f(x) = ln(1 + x)
+
+For each function, only consider its valid ranges as indicated in the notes when you are computing the Taylor Series expansion. Please submit your assignment as a R-Markdown document.
+
+1. For f(x) = 1/(1-x), we have the following:
+
+$$f(x) = 1/(1-x)$$
+$$f'(x) = 1/(1-x)^2$$
+$$f''(x) = 2/(1-x)^3$$
+$$f'''(x) = 6/(1-x)^4$$
+$$f^{n}(x) = n!/(1-x)^{n+1}$$
+$$f^{n}(0) = n!$$
+Next, we use the Taylor Series formula to get
+
+$$1/(1-x) = \sum f^{n}(0)/n! *x^n = \sum n!/n! *x^n = \sum x^n $$
+
+2. For f(x) = e^x, we have the following:
+
+$$f(x) = e^x$$
+$$f'(x) = e^x$$
+$$f''(x) = e^x$$
+$$f'''(x) = e^x$$
+$$f^{n}(x) = e^x$$
+$$f^{n}(0) = 1$$
+Next, we use the Taylor Series formula to get
+
+$$e^x = \sum f^{n}(0)/n! *x^n = \sum 1/n! *x^n $$
+3. For f(x) = ln(1 + x), we have the following:
+
+$$f(x) = ln(1 + x)$$
+$$f'(x) = 1/(1+x)$$
+$$f''(x) = -1/(1+x)^2$$
+$$f'''(x) = 2/(1+x)^3$$
+$$f^{n}(x) = (-1)^{n-1}*(n-1)!/(1+x)^n$$
+$$f^{n}(0) = (-1)^{n-1}*(n-1)!$$
+Next, we use the Taylor Series formula to get
+
+$$ln(1 + x) = \sum f^{n}(0)/n! *x^n = \sum (-1)^{n-1}*(n-1)!/n! *x^n $$
+
