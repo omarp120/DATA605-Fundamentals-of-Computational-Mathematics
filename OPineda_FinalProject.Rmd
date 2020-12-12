@@ -1,0 +1,298 @@
+---
+title: "DATA605 Final Examination"
+author: "Omar Pineda"
+date: "12/11/2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+Problem 1
+
+Using R, generate a random variable X that has 10,000 random uniform numbers from 1 to N, where N can be any number of your choosing greater than or equal to 6.  Then generate a random variable Y that has 10,000 random normal numbers with a mean of (N+1)/2.  
+
+```{r}
+set.seed(100)
+N <- 6
+n <- 10000
+X <- runif(n, 1, N)
+Y <- rnorm(n, (N+1)/2, (N+1)/2)
+df <- data.frame(cbind(X,Y))
+```
+
+Probability. 
+
+Calculate as a minimum the below probabilities a through c. Assume the small letter "x" is estimated as the median of the X variable, and the small letter "y" is estimated as the 1st quartile of the Y variable. Interpret the meaning of all probabilities.
+
+Here we declare x and y and assign them their respective values.
+
+```{r}
+summary(X)
+```
+
+```{r}
+x <- summary(X)[3]
+x
+```
+
+```{r}
+summary(Y)
+```
+
+```{r}
+y <- summary(Y)[2]
+y
+```
+
+a. P(X>x | X>y)		
+
+```{r}
+#subsetting data for P(X>y)
+p1 <- nrow(subset(df, X>y))/n
+
+#subsetting data for P(X>x & X>y)
+p2 <- nrow(subset(df, X>x & X>y))/n
+
+#calculating for P(X>x | X>y)
+p3 <- p2/p1
+p3
+```
+
+b. P(X>x, Y>y)
+
+```{r}
+p4 <- nrow(subset(df, X > x & Y >y))/n
+p4
+```
+
+c. P(X<x | X>y)	
+
+```{r}
+#subsetting data for P(X<x & X>y)
+p5 <- nrow(subset(df, X<x & X>y))/n
+
+#calculating for P(X<x | X>y)
+p6 <- p5/p1
+p6
+```
+
+Investigate whether P(X>x and Y>y) = P(X>x)P(Y>y) by building a table and evaluating the marginal and joint probabilities.
+
+The joint probability as shown in this table is the upper left value which is P(X>x and Y>y) = 0.3755. For the marginal probabilities, we can see that P(X>x) = 0.3755 + 0.1245 = 0.5 and P(Y>y) = 0.3755 + 0.3745 = 0.75. Multiplying these two marginal probabilities, we get P(X>x)P(Y>y) = 0.5*0.75 = 0.375 = P(X>x and Y>y). Therefore, this statement is true.
+
+```{r}
+#subsetting data for the different possible values of X and Y
+p7 <- nrow(subset(df, X>x & Y>y))/n
+p8 <- nrow(subset(df, X<=x & Y>y))/n
+p9 <- nrow(subset(df, X>x & Y<=y))/n
+p10 <- nrow(subset(df, X<=x & Y<=y))/n
+
+tab <- matrix(c(p7, p8, p9, p10), 2, 2,
+             dimnames = list(c("X>x", "X<=x"), c("Y>y", "Y<=y")))
+tab
+```
+
+Check to see if independence holds by using Fisher’s Exact Test and the Chi Square Test.  What is the difference between the two? Which is most appropriate?
+
+The difference between the two tests is that Fisher's test is recommended for use with smaller sample sizes, whereas the Chi Square test is not necessarily. As our sample size is relatively large, we go with the Chi Square test here. Our test returns a p-value of 0.8353 > 0.05, so we fail to reject the null hypothesis and conclude that X and Y are independent.
+
+```{r}
+tab2 <- tab*10000
+tab2
+```
+
+```{r}
+fisher.test(tab2)
+```
+
+```{r}
+chisq.test(tab2)
+```
+
+Problem 2
+
+You are to register for Kaggle.com (free) and compete in the House Prices: Advanced Regression Techniques competition.  https://www.kaggle.com/c/house-prices-advanced-regression-techniques.  
+
+Descriptive and Inferential Statistics. 
+
+Provide univariate descriptive statistics and appropriate plots for the training data set. Provide a scatterplot matrix for at least two of the independent variables and the dependent variable. Derive a correlation matrix for any three quantitative variables in the dataset. Test the hypotheses that the correlations between each pairwise set of variables is 0 and provide an 80% confidence interval. Discuss the meaning of your analysis. Would you be worried about familywise error? Why or why not?
+
+First, we load in our data. Our training dataset has 81 columns and 1,460 observations.
+
+```{r}
+train <- read.csv("https://raw.githubusercontent.com/omarp120/DATA605-Fundamentals-of-Computational-Mathematics/master/train.csv") 
+test <- read.csv("https://raw.githubusercontent.com/omarp120/DATA605-Fundamentals-of-Computational-Mathematics/master/test.csv")
+
+head(train)
+nrow(train)
+```
+Here we have some general statistics for each of our variables.
+
+```{r}
+summary(train)
+```
+
+Our dependent variable is SalePrice. We also look at scatterplots of the independent variables LotArea and GrLivArea against SalePrice to see what sort of relationship exists between them.
+
+It appears that both of these independent variables have a positive and linear relationship with our dependent variable, SalePrice. The scatterplots show that there are outliers in both relationships, and this is more so true in LotArea's.
+
+```{r}
+par(mfrow=c(1,2))
+plot(train$SalePrice~train$LotArea)
+plot(train$SalePrice~train$GrLivArea)
+```
+
+We confirm the presence of outliers through the below boxplots for our variables.
+
+```{r}
+par(mfrow=c(1,3))
+boxplot(train$LotArea)
+boxplot(train$GrLivArea)
+boxplot(train$SalePrice)
+```
+
+Next, we look at the correlation matrix for these three variables. As we saw in the scatterplot, LotArea and GrLivArea have positive correlations with SalePrice. GrLivArea has a stornger correlation with SalePrice than LotArea does. LotArea also has a positive correlation with GrLivArea of equal magnitude to the correlation that is has with SalePrice.
+
+```{r}
+library(dplyr)
+cor <- train %>% select(LotArea, GrLivArea, SalePrice) %>% cor()
+round(cor, 2)
+```
+
+We test out the hypothesis that the correlations between each pairwise set of variables is 0 using an 80% confidence interval.
+
+LotArea vs SalePrice:
+
+```{r}
+cor.test(train$LotArea, train$SalePrice, conf.level = 0.8)$conf.int[1:2]
+```
+
+GrLivArea vs SalePrice:
+
+```{r}
+cor.test(train$GrLivArea, train$SalePrice, conf.level = 0.8)$conf.int[1:2]
+```
+
+LotArea vs GrLivArea:
+
+```{r}
+cor.test(train$LotArea, train$GrLivArea, conf.level = 0.8)$conf.int[1:2]
+```
+
+None of the intervals for any of these pairs contain 0, so we can conclude that there are in fact significant relationships between these variables. I would be careful about possible familywise errors considering how many variables are in our dataset, but it doesn't look like this is an issue for these variables from the above tests.
+
+Linear Algebra and Correlation  
+
+Invert your correlation matrix from above. (This is known as the precision matrix and contains variance inflation factors on the diagonal.) Multiply the correlation matrix by the precision matrix, and then multiply the precision matrix by the correlation matrix. Conduct LU decomposition on the matrix.  
+
+First, we invert our matrix.
+
+```{r}
+precision_mat <- solve(cor)
+precision_mat
+```
+
+We then multiply the correlation matrix by the precision matrix.
+
+```{r}
+cor%*%precision_mat
+```
+
+Here we instead multiply the precision matrix by the correlation matrix.
+
+```{r}
+precision_mat%*%cor
+```
+
+Lastly, we conduct LU decomposition on the matrix.
+
+```{r}
+library(matrixcalc)
+LU <- lu.decomposition(cor)
+LU
+```
+
+Calculus-Based Probability & Statistics.  
+
+Many times, it makes sense to fit a closed form distribution to data.  Select a variable in the Kaggle.com training dataset that is skewed to the right, shift it so that the minimum value is absolutely above zero if necessary.  Then load the MASS package and run fitdistr to fit an exponential probability density function.  (See https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/fitdistr.html ). Find the optimal value of lambda for this distribution, and then take 1000 samples from this exponential distribution using this value (e.g., rexp(1000, lambda)). Plot a histogram and compare it with a histogram of your original variable. Using the exponential pdf, find the 5th and 95th percentiles using the cumulative distribution function (CDF). Also generate a 95% confidence interval from the empirical data, assuming normality. Finally, provide the empirical 5th percentile and 95th percentile of the data. Discuss.
+
+I chose to work with the LotArea variable as its minimum variable is 1,300 which is well above 0. Its distribution is also right skewed, as shown in the below histogram.
+
+```{r}
+summary(train$LotArea)
+```
+
+```{r}
+hist(train$LotArea, breaks = 50)
+```
+
+Next, we use the fitdistr function from the MASS package to fit an exponential probability density function.
+
+```{r}
+library(MASS)
+m1 <- fitdistr(train$LotArea, "exponential")
+```
+
+For this distribution the value of lambda is 9.50857e-05.
+
+```{r}
+l <- m1$estimate
+l
+```
+
+Here we take 1,000 samples from this exponential distribution using our value of lambda and plot its histogram next to our original histogram of LotArea. Our new distribution seems less right-skewed than the original one.
+
+```{r}
+sim <- rexp(1000,l)
+
+par(mfrow=c(1,2))
+hist(train$LotArea, breaks = 50)
+hist(sim, breaks = 50)
+```
+
+Next, we find the 5th and 95th percentiles using the cumulative distribution function.
+
+```{r}
+quantile(ecdf(sim), c(0.05, 0.95))
+```
+
+We also assume normality and generate a 95% confidence interval from the empirical data.
+
+```{r}
+library(gmodels)
+ci(train$LotArea, confidence=0.95)
+```
+
+Finally, we provide the empirical 5th percentile and 95th percentile of the data. It doesn't seem like the exponential fit is the best choice here as the percentiles diverge by a lot.
+
+```{r}
+quantile(train$LotArea, c(0.05, 0.95))
+```
+
+Modeling.  Build some type of multiple regression  model and submit your model to the competition board.  Provide your complete model summary and results with analysis. Report your Kaggle.com user name and score.
+
+Here is the multiple regression model that I developed. Both LotArea and GrLivArea have p-values < 0.05, so they are statistically significant predictors of SalePrice. These two variables explain 50.1% of the variance in SalePrice. My kaggle score for this competition was 0.29009 and my user name is 'omarpinedajr'.
+
+```{r}
+m2 <- lm(SalePrice ~ LotArea + GrLivArea, data = train)
+summary(m2)
+```
+
+Here we check some of the assumptions for our model. There does not seem to be a significant relationship between the residuals and they also seem normally distributed.
+
+```{r}
+plot(m2)
+```
+
+```{r}
+hist(m2$residuals)
+```
+
+Finally, we make predictions using our test dataset and submit these to the Kaggle competition.
+
+```{r}
+predictions <- predict(m2, newdata = test)
+pred_df <- data.frame(Id = test$Id, SalePrice = predictions %>% unname())
+head(pred_df)
+write.csv(pred_df, "housingPrices.csv", row.names = FALSE)
+```
